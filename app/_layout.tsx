@@ -13,13 +13,27 @@ export default function RootLayout() {
           fontWeight: "bold",
         },
         contentStyle: {
-          paddingHorizontal: 20,
-          paddingTop: 10,
           backgroundColor: "#ddd",
         },
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: true }} />
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          title: "Home",
+          headerTitleAlign: "center",
+        }}
+      />
+
+      <Stack.Screen
+        name="notes"
+        options={{
+          headerShown: true,
+          headerTitle: "Notes",
+          headerTitleAlign: "center",
+        }}
+      />
     </Stack>
   );
 }
