@@ -1,19 +1,7 @@
+import { AddNoteButton, AddNoteModal, NoteList } from "@/components";
+import { Note } from "@/models/Note";
 import React, { useState } from "react";
-import {
-  FlatList,
-  Modal,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-
-interface Note {
-  id: number;
-  title: string;
-}
+import { StyleSheet, View } from "react-native";
 
 const NotesScreen = () => {
   const [notes, setNotes] = useState<Note[]>([
@@ -23,49 +11,34 @@ const NotesScreen = () => {
   ]);
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [newNote, setNewNote] = useState<{ title: string }>({ title: "" });
 
-  const toggleModal = (prev: boolean) => setModalVisible(!prev);
+  const toggleModal = () => setModalVisible(!modalVisible);
+
+  const saveNoteHandler = (title: string) => {
+    if (!title || !title.length || title.trim().length === 0) return;
+
+    setNotes((prevNotes) => [
+      ...prevNotes,
+      { id: prevNotes.length + 1, title },
+    ]);
+    toggleModal();
+    setNewNote({ title: "" });
+  };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={notes}
-        keyExtractor={(item: Note) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.noteItem}>
-            <Text>{item.title}</Text>
-          </View>
-        )}
+      <NoteList notes={notes} />
+
+      <AddNoteButton modalVisible={modalVisible} toggleModal={toggleModal} />
+
+      <AddNoteModal
+        modalVisible={modalVisible}
+        toggleModal={toggleModal}
+        saveNoteHandler={saveNoteHandler}
+        newNote={newNote}
+        setNewNote={setNewNote}
       />
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => toggleModal(modalVisible)}
-      >
-        <Text style={styles.buttonText}>+ Add Note</Text>
-      </TouchableOpacity>
-
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        style={styles.modal}
-      >
-        <View style={styles.modalView}>
-          <Text>Create New Note</Text>
-          <TouchableWithoutFeedback>
-            <TextInput placeholder="Note Title" />
-          </TouchableWithoutFeedback>
-          <View style={styles.modalButtons}>
-            <TouchableOpacity onPress={() => toggleModal(modalVisible)}>
-              <Text>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleModal(modalVisible)}>
-              <Text>Save</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -80,59 +53,5 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     paddingTop: 40,
     paddingBottom: 80,
-  },
-  noteItem: {
-    backgroundColor: "#ddd",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    borderRadius: 5,
-    margin: 10,
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  button: {
-    width: 150,
-    textAlign: "center",
-    alignSelf: "center",
-    marginTop: 30,
-    backgroundColor: "orange",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-    paddingVertical: 20,
-  },
-  modal: {
-    backgroundColor: "#fff",
-    marginTop: 200,
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalView: {
-    position: "absolute",
-    top: "50%",
-    left: "10%",
-    right: "10%",
-    transform: [{ translateY: "-50%" }],
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
   },
 });
